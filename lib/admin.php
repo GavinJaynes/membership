@@ -27,7 +27,6 @@ function admin_css() {
 }
 add_action('login_head', 'admin_css');
 
-
 /**
  * Change the link so the the replaced WP logo links to the site
  * http://codex.wordpress.org/Plugin_API/Filter_Reference/login_headerurl
@@ -37,8 +36,6 @@ function the_url( $url ) {
     return get_bloginfo( 'url' );
 }
 add_filter( 'login_headerurl', 'the_url' );
-
-
 
 /**
  * Change the link so the the replaced WP logo links to the site
@@ -64,12 +61,15 @@ add_action('login_message', 'register_intro_edit');
  * PART TWO OF THE SERIES
  */
 
+/**
+ * Adding the HTML to the existing registration form
+ */
 function register_form_edit() {
 
 	$twitter_name = ( ! empty( $_POST['twitter_name'] ) ) ? trim( $_POST['twitter_name'] ) : ''; ?>
     <p>
         <label for="twitter_name">
-        	<?php _e( 'Twitter name', 'roots' ) ?><br />
+        	<?php _e( 'Twitter name', 'sage' ) ?><br />
         	<input type="text" name="twitter_name" id="twitter_name" class="input" value="<?php echo esc_attr( wp_unslash( $twitter_name ) ); ?>" size="25" />
         </label>
     </p>
@@ -78,29 +78,34 @@ function register_form_edit() {
     <p>
         <label for="terms">
         	<input type="checkbox" name="terms" id="terms" class="input" value="agreed" <?php checked( $_POST['terms'], 'agreed', true ); ?> />
-        	<?php _e( 'I have read the terms and conditions', 'roots' ) ?>
+        	<?php _e( 'I have read the terms and conditions', 'sage' ) ?>
         </label>
     </p>
     <?php
 }
 add_action( 'register_form', 'register_form_edit' );
 
-//2. Add validation. In this case, we make sure twitter_name is required.
+/**
+ * Validate our new feilds
+ *  @param error object
+ *  @param user login
+ *  @param user email
+ */
 function validate_registration( $errors, $sanitized_user_login, $user_email ) {
 
 	if ( empty( $_POST['twitter_name'] ) || !empty( $_POST['twitter_name'] ) && trim( $_POST['twitter_name'] ) == '' ) {
 
-		$errors->add( 'twitter_name_error', __( '<strong>ERROR</strong>: Please enter your Twitter name.', 'roots' ) );
+		$errors->add( 'twitter_name_error', __( '<strong>ERROR</strong>: Please enter your Twitter name.', 'sage' ) );
 	}
 
 	if ( preg_match('/[^a-z_\-0-9]/i', $_POST['twitter_name']) ) {
 
-		$errors->add( 'twitter_name_error', __( '<strong>ERROR</strong>: Please use letters, numbers, spaces and underscores only.', 'roots' ) );
+		$errors->add( 'twitter_name_error', __( '<strong>ERROR</strong>: Please use letters, numbers, spaces and underscores only.', 'sage' ) );
 	}
 
 	if ( empty( $_POST['terms'] ) ) {
 
-		$errors->add( 'terms_error', __( '<strong>ERROR</strong>: You must agree to the terms.', 'roots' ) );
+		$errors->add( 'terms_error', __( '<strong>ERROR</strong>: You must agree to the terms.', 'sage' ) );
 	}
 
 	return $errors;
@@ -179,7 +184,7 @@ function custom_user_profile_fields($user) {
 	</th>
 	<td>
 		<input type="text" name="twitter_name" id="twitter_name" value="<?php echo esc_attr( get_user_meta( $user->ID, 'twitter_name', true ) ); ?>" class="regular-text" />
-		<br><span class="description"><?php _e('Twitter name', 'roots'); ?></span>
+		<br><span class="description"><?php _e('Twitter name', 'sage'); ?></span>
 	</td>
 </tr>
 <?php get_user_meta( $user->ID, 'twitter_name'); ?>
