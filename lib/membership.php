@@ -1,14 +1,14 @@
 <?php
 /**
- * Contains all the front end facing functions that aid membership 
+ * Contains all the front end facing functions that aid membership
  *
- */ 
+ */
 
 /**
- * Makes pages where this function is called only 
+ * Makes pages where this function is called only
  * accesible if you are logged in
  */
-function private_page() {
+function tutsplus_private_page() {
 
 	if(!is_user_logged_in()){
 
@@ -18,10 +18,10 @@ function private_page() {
 }
 
 /**
- * Outputs some user specific nvaigation 
- * 
+ * Outputs some user specific nvaigation
+ *
  */
-function user_nav() {
+function tutsplus_user_nav() {
 
 	$user_id = get_current_user_id();
 	$user_name = get_user_meta( $user_id, 'first_name', true);
@@ -43,9 +43,9 @@ function user_nav() {
 
 /**
  * Stop subscribers from accessing the backed
- * Also turn off the admin bar for anyone but administrators 
+ * Also turn off the admin bar for anyone but administrators
  */
-function lock_it_down() {
+function tutsplus_lock_it_down() {
 
 	if (!current_user_can('administrator') && !is_admin()) {
 
@@ -57,19 +57,19 @@ function lock_it_down() {
   		wp_safe_redirect('profile');
 	}
 }
-add_action('after_setup_theme', 'lock_it_down');
+add_action('after_setup_theme', 'tutsplus_lock_it_down');
 
 /**
  * Pocess the profile editor form
  */
-function process_user_profile_data() {
+function tutsplus_process_user_profile_data() {
 
 	if( isset($_POST['user_profile_nonce_field']) && wp_verify_nonce($_POST['user_profile_nonce_field'], 'user_profile_nonce')) {
 
 		// Get the current user id
 		$user_id = get_current_user_id();
 
-		// Put our data into a better looking array and sanitize it 
+		// Put our data into a better looking array and sanitize it
 		$user_data = array(
 
 			'first_name' 	=> sanitize_text_field($_POST['first_name']),
@@ -78,7 +78,7 @@ function process_user_profile_data() {
 			'twitter_name' 	=> sanitize_text_field($_POST['twitter_name']),
 			'user_pass' 	=> $_POST['pass1'],
 			);
-		
+
 		if(!empty($user_data['user_pass'])) {
 
 			// Validate the passwords to check they are the same
@@ -95,7 +95,7 @@ function process_user_profile_data() {
 
 		// Save the values to the post
 		foreach($user_data as $key => $value) {
-			
+
 			// http://codex.wordpress.org/Function_Reference/wp_update_user
 			if($key == 'twitter_name') {
 
@@ -103,11 +103,11 @@ function process_user_profile_data() {
 				unset($user_data['twitter_name']);
 
 			} elseif ($key == 'user_pass') {
-				
-				$user_id = wp_set_password( $user_data['user_pass'], $user_id ); 
+
+				$user_id = wp_set_password( $user_data['user_pass'], $user_id );
 				unset($user_data['user_pass']);
-			
-			// Save the remaining values	
+
+			// Save the remaining values
 			} else {
 
 				$user_id = wp_update_user( array( 'ID' => $user_id, $key => $value ) );
@@ -116,47 +116,47 @@ function process_user_profile_data() {
 
 		// Display the messages error/success
 	   	if (!is_wp_error( $user_id )){
-	      
+
 	      wp_redirect('?profile-updated=true');
 
 	   	} else {
-	 
+
 	      wp_redirect("?profile-updated=false");
 	   	}
 	 	exit;
 	}
 }
-add_action('process_user_profile','process_user_profile_data');
+add_action('tutsplus_process_user_profile','tutsplus_process_user_profile_data');
 
 
 /**
  * Display the correct message based on the query string
  */
-function display_messages( $content ) {
+function tutsplus_display_messages( $content ) {
 
-	if( $_GET['profile-updated'] == 'true' ) : 
+	if( 'true' == $_GET['profile-updated']  ) :
 
-	$message = get_message('Your information was succesfully updated', 'success' );
+	$message = tutsplus_get_message('Your information was succesfully updated', 'success' );
 
-	elseif( $_GET['profile-updated'] == 'false' ) :
+	elseif( 'false' == $_GET['profile-updated'] ) :
 
-	$message = get_message('There was an error processing your request', 'danger' );	
+	$message = tutsplus_get_message('There was an error processing your request', 'danger' );
 
-	elseif( $_GET['password-error'] == 'true' ) :	
+	elseif( 'true' == $_GET['password-error'] ) :
 
-	$message = get_message('The passwords you provided did not match', 'danger' );	
- 
-	endif;	
+	$message = tutsplus_get_message('The passwords you provided did not match', 'danger' );
+
+	endif;
 
 	return $message . $content;
 
 }
-add_filter('the_content','display_messages', 1);
+add_filter('the_content','tutsplus_display_messages', 1);
 
 /**
  * A little helper function to get the Bootstrap alerts
  */
-function get_message( $string, $type ) {
+function tutsplus_get_message( $string, $type ) {
 
 	$output .= '<div class="alert alert-'.$type.' alert-dismissable">';
 	$output .= '<button type="button" class="close" data-dismiss="alert" aria-hidden="true"><i class="fa fa-times-circle"></i></button>';

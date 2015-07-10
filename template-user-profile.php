@@ -4,21 +4,21 @@ Template Name: User profile
 */
 ?>
 
-<?php private_page(); ?>
+<?php tutsplus_private_page(); ?>
 
 <?php while (have_posts()) : the_post(); ?>
 	<?php get_template_part('templates/page', 'header'); ?>
 	<?php get_template_part('templates/content', 'page'); ?>
 
-	<?php do_action( 'process_user_profile' ); ?>
-	<?php 
+	<?php do_action( 'tutsplus_process_user_profile' ); ?>
+	<?php
 	/**
- 	* Get's the user info 
+ 	* Get's the user info
  	* Returned in an object
  	* http://codex.wordpress.org/Function_Reference/get_userdata
  	*/
 	$user_id 	= get_current_user_id();
-	$user_info 	= get_userdata($user_id); 
+	$user_info 	= get_userdata($user_id);
 	?>
 
 	<form role="form" action="" id="user_profile" method="POST">
