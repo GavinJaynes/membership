@@ -132,6 +132,55 @@ function tutsplus_process_registration( $user_id ) {
 add_action( 'user_register', 'tutsplus_process_registration' );
 
 
+
+
+/** Display in the wp backend
+ * http://codex.wordpress.org/Plugin_API/Action_Reference/show_user_profile
+ *
+ * Show custom user profile fields
+ * @param  obj $user The WP user object.
+ * @return void
+ */
+function tutsplus_custom_user_profile_fields( $user ) {
+?>
+<table class="form-table">
+	<tr>
+		<th>
+			<label for="twitter_name"><?php __e( 'Twitter name','sage' ); ?></label>
+		</th>
+		<td>
+			<input type="text" name="twitter_name" id="twitter_name" value="<?php echo esc_attr( get_the_author_meta( 'twitter_name', $user->ID ) ); ?>" class="regular-text" />
+		</td>
+	</tr>
+</table>
+<?php
+}
+// Hooks near the bottom of profile page (if current user)
+add_action('show_user_profile', 'tutsplus_custom_user_profile_fields');
+// Hooks near the bottom of the profile page (if not current user)
+add_action('edit_user_profile', 'tutsplus_custom_user_profile_fields');
+
+/** Update the custom meta
+ * https://codex.wordpress.org/Plugin_API/Action_Reference/personal_options_update
+ * https://codex.wordpress.org/Plugin_API/Action_Reference/edit_user_profile_update
+ *
+ * Show custom user profile fields
+ * @param  int user_id.
+ */
+function tutsplus_update_extra_profile_fields( $user_id ) {
+
+   if ( current_user_can( 'edit_user', $user_id ) )
+
+      update_user_meta( $user_id, 'twitter_name', $_POST['twitter_name'] );
+}
+// Hook is used to save custom fields that have been added to the WordPress profile page (if current user)
+add_action( 'personal_options_update', 'tutsplus_update_extra_profile_fields' );
+// Hook is used to save custom fields that have been added to the WordPress profile page (if not current user)
+add_action( 'edit_user_profile_update', 'tutsplus_update_extra_profile_fields' );
+
+
+
+
 /**
  * Redirect user after successful login.
  *
@@ -158,38 +207,3 @@ function tutsplus_redirect_on_login( $redirect_to, $request, $user ) {
 	}
 }
 add_filter( 'login_redirect', 'tutsplus_redirect_on_login', 10, 3 );
-
-
-
-
-/** ==================================================================
- * PART THREE OF THE SERIES
- */
-// Display in the wp backend
-
-//http://codex.wordpress.org/Plugin_API/Action_Reference/show_user_profile
-
-
-/**
- * Show custom user profile fields
- * @param  obj $user The user object.
- * @return void
- */
-function tutsplus_custom_user_profile_fields($user) {
-?>
-<table class="form-table">
-<tr>
-	<th>
-		<label for="twitter_name"><?php _e('Twitter'); ?></label>
-	</th>
-	<td>
-		<input type="text" name="twitter_name" id="twitter_name" value="<?php echo esc_attr( get_user_meta( $user->ID, 'twitter_name', true ) ); ?>" class="regular-text" />
-		<br><span class="description"><?php _e('Twitter name', 'sage'); ?></span>
-	</td>
-</tr>
-<?php get_user_meta( $user->ID, 'twitter_name'); ?>
-</table>
-<?php
-}
-add_action('show_user_profile', 'tutsplus_custom_user_profile_fields');
-add_action('edit_user_profile', 'tutsplus_custom_user_profile_fields');

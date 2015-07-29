@@ -18,30 +18,6 @@ function tutsplus_private_page() {
 }
 
 /**
- * Outputs some user specific nvaigation
- *
- */
-function tutsplus_user_nav() {
-
-	$user_id = get_current_user_id();
-	$user_name = get_user_meta( $user_id, 'first_name', true);
-
-	echo '<ul class="nav navbar-nav navbar-right">';
-
-	if(is_user_logged_in()) {
-
-		echo '<li><a href="' .home_url('profile').'">Welcome '.$user_name.'</a></li>';
-		echo '<li><a href="' .wp_logout_url( home_url() ).'">Log out</a></li>';
-
-	} else {
-
-		echo '<li><a href="' .wp_login_url(). '">Log in</a></li>';
-	}
-
-	echo '</ul>';
-}
-
-/**
  * Stop subscribers from accessing the backed
  * Also turn off the admin bar for anyone but administrators
  */
@@ -49,15 +25,47 @@ function tutsplus_lock_it_down() {
 
 	if (!current_user_can('administrator') && !is_admin()) {
 
-  		show_admin_bar(false);
+		show_admin_bar(false);
 	}
 
 	if (current_user_can('subscriber') && is_admin()) {
 
-  		wp_safe_redirect('profile');
+		wp_safe_redirect('profile');
 	}
 }
 add_action('after_setup_theme', 'tutsplus_lock_it_down');
+
+/**
+ * Outputs some user specific nvaigation
+ *
+ */
+function tutsplus_user_nav() {
+
+	$user_id = get_current_user_id();
+	$user_name = get_user_meta( $user_id, 'first_name', true );
+	$welcome_message = __( 'Welcome', 'sage' ) . ' ' . $user_name;
+
+	echo '<ul class="nav navbar-nav navbar-right">';
+
+		if ( is_user_logged_in() ) {
+
+		echo '<li>';
+			echo '<a href="' . home_url( 'profile') . '">' . $welcome_message . '</a>';
+		echo '</li>';
+		echo '<li>';
+			echo '<a href="' . wp_logout_url( home_url() ) . '">' . __( 'Log out', 'sage' ) . '</a>';
+		echo '</li>';
+
+		} else {
+
+		echo '<li>';
+			echo '<a href="' . wp_login_url() . '">' . __( 'Log in', 'sage' ) . '</a>';
+		echo '</li>';
+
+	}
+
+	echo '</ul>';
+}
 
 /**
  * Pocess the profile editor form
@@ -75,7 +83,7 @@ function tutsplus_process_user_profile_data() {
 			'first_name' 	=> sanitize_text_field($_POST['first_name']),
 			'last_name' 	=> sanitize_text_field($_POST['last_name']),
 			'user_email' 	=> sanitize_email($_POST['email']),
-			'twitter_name' 	=> sanitize_text_field($_POST['twitter_name']),
+			'twitter_name'	=> sanitize_text_field($_POST['twitter_name']),
 			'user_pass' 	=> $_POST['pass1'],
 			);
 
@@ -115,36 +123,39 @@ function tutsplus_process_user_profile_data() {
 		}
 
 		// Display the messages error/success
-	   	if (!is_wp_error( $user_id )){
+			if (!is_wp_error( $user_id )){
 
-	      wp_redirect('?profile-updated=true');
+				wp_redirect('?profile-updated=true');
 
-	   	} else {
+			} else {
 
-	      wp_redirect("?profile-updated=false");
-	   	}
-	 	exit;
+				wp_redirect("?profile-updated=false");
+			}
+		exit;
 	}
 }
 add_action('tutsplus_process_user_profile','tutsplus_process_user_profile_data');
 
 
 /**
- * Display the correct message based on the query string
+ * Display the correct message based on the query string.
+ *
+ * @param string $content Post content.
+ * @return string Message and content.
  */
 function tutsplus_display_messages( $content ) {
 
 	if( 'true' == $_GET['profile-updated']  ) :
 
-	$message = tutsplus_get_message('Your information was succesfully updated', 'success' );
+	$message = tutsplus_get_message_markup('Your information was succesfully updated', 'success' );
 
 	elseif( 'false' == $_GET['profile-updated'] ) :
 
-	$message = tutsplus_get_message('There was an error processing your request', 'danger' );
+	$message = tutsplus_get_message_markup('There was an error processing your request', 'danger' );
 
 	elseif( 'true' == $_GET['password-error'] ) :
 
-	$message = tutsplus_get_message('The passwords you provided did not match', 'danger' );
+	$message = tutsplus_get_message_markup('The passwords you provided did not match', 'danger' );
 
 	endif;
 
@@ -154,13 +165,19 @@ function tutsplus_display_messages( $content ) {
 add_filter('the_content','tutsplus_display_messages', 1);
 
 /**
- * A little helper function to get the Bootstrap alerts
+ * A little helper function to generate the Bootstrap alerts markup.
+ *
+ * @param string $message Message to display.
+ * @param string $severity Severity of message to display.
+ * @return string Message markup.
  */
-function tutsplus_get_message( $string, $type ) {
+function tutsplus_get_message_markup( $message, $severity ) {
 
-	$output .= '<div class="alert alert-'.$type.' alert-dismissable">';
-	$output .= '<button type="button" class="close" data-dismiss="alert" aria-hidden="true"><i class="fa fa-times-circle"></i></button>';
-	$output .= '<p class="text-center">'.$string.'</p>';
+	$output = '<div class="alert alert-' . $severity . ' alert-dismissable">';
+			$output .= '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">';
+					$output .= '<i class="fa fa-times-circle"></i>';
+			$output .= '</button>';
+			$output .= '<p class="text-center">' . $message . '</p>';
 	$output .= '</div>';
 
 	return $output;

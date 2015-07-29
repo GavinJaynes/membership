@@ -18,7 +18,7 @@
         wp_nav_menu(['theme_location' => 'primary_navigation', 'walker' => new NavWalker(), 'menu_class' => 'nav navbar-nav']);
       endif;
       ?>
-      <?php user_nav(); ?>
+      <?php tutsplus_user_nav(); ?>
     </nav>
   </div>
 </header>
