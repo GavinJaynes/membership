@@ -36,7 +36,7 @@ function tutsplus_lock_it_down() {
 add_action( 'after_setup_theme', 'tutsplus_lock_it_down' );
 
 /**
- * Outputs some user specific nvaigation
+ * Outputs some user specific navigation
  *
  */
 function tutsplus_user_nav() {
