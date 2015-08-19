@@ -25,7 +25,7 @@ function tutsplus_admin_css() {
 		wp_enqueue_style( 'login_css', get_template_directory_uri() . '/admin/css/custom-login.css' );
 	}
 }
-add_action('login_head', 'tutsplus_admin_css');
+add_action( 'login_head', 'tutsplus_admin_css' );
 
 /**
  * Change the link so the the replaced WP logo links to the site
@@ -41,9 +41,9 @@ add_filter( 'login_headerurl', 'tutsplus_the_url' );
  * Change the link so the the replaced WP logo links to the site
  * http://codex.wordpress.org/Plugin_API/Filter_Reference/login_headerurl
  */
-function tutsplus_register_intro_edit($message) {
+function tutsplus_register_intro_edit( $message ) {
 
-	if (strpos($message, 'Register') !== FALSE) {
+	if ( strpos($message, 'Register' ) !== FALSE) {
 
 		$register_intro = "Become a member. It's easy! Fill in the form below.";
 
@@ -54,7 +54,7 @@ function tutsplus_register_intro_edit($message) {
 		return $message;
 	}
 }
-add_action('login_message', 'tutsplus_register_intro_edit');
+add_action( 'login_message', 'tutsplus_register_intro_edit' );
 
 
 /** ==================================================================
@@ -67,21 +67,21 @@ add_action('login_message', 'tutsplus_register_intro_edit');
 function tutsplus_register_form_edit() {
 
 	$twitter_name = ( ! empty( $_POST['twitter_name'] ) ) ? trim( $_POST['twitter_name'] ) : ''; ?>
-    <p>
-        <label for="twitter_name">
-        	<?php _e( 'Twitter name', 'sage' ) ?><br />
-        	<input type="text" name="twitter_name" id="twitter_name" class="input" value="<?php echo esc_attr( wp_unslash( $twitter_name ) ); ?>" size="25" />
-        </label>
-    </p>
+	<p>
+	<label for="twitter_name">
+		<?php _e( 'Twitter name', 'sage' ) ?><br />
+		<input type="text" name="twitter_name" id="twitter_name" class="input" value="<?php echo esc_attr( wp_unslash( $twitter_name ) ); ?>" size="25" />
+	</label>
+	</p>
 
 	<?php $terms = ( ! empty( $_POST['terms'] ) ) ? $_POST['terms'] : ''; ?>
-    <p>
-        <label for="terms">
-        	<input type="checkbox" name="terms" id="terms" class="input" value="agreed" <?php checked( $_POST['terms'], 'agreed', true ); ?> />
-        	<?php _e( 'I have read the terms and conditions', 'sage' ) ?>
-        </label>
-    </p>
-    <?php
+	<p>
+	<label for="terms">
+		<input type="checkbox" name="terms" id="terms" class="input" value="agreed" <?php checked( $_POST['terms'], 'agreed', true ); ?> />
+		<?php _e( 'I have read the terms and conditions', 'sage' ) ?>
+	</label>
+	</p>
+	<?php
 }
 add_action( 'register_form', 'tutsplus_register_form_edit' );
 
@@ -131,9 +131,6 @@ function tutsplus_process_registration( $user_id ) {
 }
 add_action( 'user_register', 'tutsplus_process_registration' );
 
-
-
-
 /** Display in the wp backend
  * http://codex.wordpress.org/Plugin_API/Action_Reference/show_user_profile
  *
@@ -156,9 +153,9 @@ function tutsplus_custom_user_profile_fields( $user ) {
 <?php
 }
 // Hooks near the bottom of profile page (if current user)
-add_action('show_user_profile', 'tutsplus_custom_user_profile_fields');
+add_action( 'show_user_profile', 'tutsplus_custom_user_profile_fields' );
 // Hooks near the bottom of the profile page (if not current user)
-add_action('edit_user_profile', 'tutsplus_custom_user_profile_fields');
+add_action( 'edit_user_profile', 'tutsplus_custom_user_profile_fields' );
 
 /** Update the custom meta
  * https://codex.wordpress.org/Plugin_API/Action_Reference/personal_options_update
@@ -169,17 +166,14 @@ add_action('edit_user_profile', 'tutsplus_custom_user_profile_fields');
  */
 function tutsplus_update_extra_profile_fields( $user_id ) {
 
-   if ( current_user_can( 'edit_user', $user_id ) )
+	if ( current_user_can( 'edit_user', $user_id ) )
 
-      update_user_meta( $user_id, 'twitter_name', $_POST['twitter_name'] );
+		update_user_meta( $user_id, 'twitter_name', $_POST['twitter_name'] );
 }
 // Hook is used to save custom fields that have been added to the WordPress profile page (if current user)
 add_action( 'personal_options_update', 'tutsplus_update_extra_profile_fields' );
 // Hook is used to save custom fields that have been added to the WordPress profile page (if not current user)
 add_action( 'edit_user_profile_update', 'tutsplus_update_extra_profile_fields' );
-
-
-
 
 /**
  * Redirect user after successful login.
@@ -200,7 +194,7 @@ function tutsplus_redirect_on_login( $redirect_to, $request, $user ) {
 
 		} else {
 
-			return home_url('profile');
+			return home_url( 'profile' );
 		}
 	} else {
 		return $redirect_to;

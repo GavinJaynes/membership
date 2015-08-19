@@ -10,9 +10,9 @@
  */
 function tutsplus_private_page() {
 
-	if(!is_user_logged_in()){
+	if( ! is_user_logged_in() ){
 
-		wp_redirect(home_url());
+		wp_redirect( home_url() );
 		exit();
 	}
 }
@@ -23,17 +23,17 @@ function tutsplus_private_page() {
  */
 function tutsplus_lock_it_down() {
 
-	if (!current_user_can('administrator') && !is_admin()) {
+	if ( ! current_user_can('administrator') && ! is_admin() ) {
 
-		show_admin_bar(false);
+		show_admin_bar( false );
 	}
 
-	if (current_user_can('subscriber') && is_admin()) {
+	if ( current_user_can( 'subscriber' ) && is_admin() ) {
 
-		wp_safe_redirect('profile');
+		wp_safe_redirect( 'profile' );
 	}
 }
-add_action('after_setup_theme', 'tutsplus_lock_it_down');
+add_action( 'after_setup_theme', 'tutsplus_lock_it_down' );
 
 /**
  * Outputs some user specific nvaigation
@@ -50,7 +50,7 @@ function tutsplus_user_nav() {
 		if ( is_user_logged_in() ) {
 
 		echo '<li>';
-			echo '<a href="' . home_url( 'profile') . '">' . $welcome_message . '</a>';
+			echo '<a href="' . home_url( 'profile' ) . '">' . $welcome_message . '</a>';
 		echo '</li>';
 		echo '<li>';
 			echo '<a href="' . wp_logout_url( home_url() ) . '">' . __( 'Log out', 'sage' ) . '</a>';
@@ -72,7 +72,7 @@ function tutsplus_user_nav() {
  */
 function tutsplus_process_user_profile_data() {
 
-	if( isset($_POST['user_profile_nonce_field']) && wp_verify_nonce($_POST['user_profile_nonce_field'], 'user_profile_nonce')) {
+	if( isset( $_POST['user_profile_nonce_field'] ) && wp_verify_nonce( $_POST['user_profile_nonce_field'], 'user_profile_nonce' ) ) {
 
 		// Get the current user id
 		$user_id = get_current_user_id();
@@ -80,40 +80,40 @@ function tutsplus_process_user_profile_data() {
 		// Put our data into a better looking array and sanitize it
 		$user_data = array(
 
-			'first_name' 	=> sanitize_text_field($_POST['first_name']),
-			'last_name' 	=> sanitize_text_field($_POST['last_name']),
-			'user_email' 	=> sanitize_email($_POST['email']),
-			'twitter_name'	=> sanitize_text_field($_POST['twitter_name']),
+			'first_name' 	=> sanitize_text_field( $_POST['first_name'] ),
+			'last_name' 	=> sanitize_text_field( $_POST['last_name'] ),
+			'user_email' 	=> sanitize_email( $_POST['email'] ),
+			'twitter_name'	=> sanitize_text_field( $_POST['twitter_name'] ),
 			'user_pass' 	=> $_POST['pass1'],
 			);
 
-		if(!empty($user_data['user_pass'])) {
+		if( ! empty( $user_data['user_pass'] ) ) {
 
 			// Validate the passwords to check they are the same
-			if (strcmp($user_data['user_pass'], $_POST['pass2']) !== 0) {
+			if ( strcmp( $user_data['user_pass'], $_POST['pass2'] ) !== 0 ) {
 
-				wp_redirect('?password-error=true');
+				wp_redirect( '?password-error = true' );
 				exit();
 			}
 
 		} else {
 			// If the password fields are not set don't save
-			unset($user_data['user_pass']);
+			unset( $user_data['user_pass'] );
 		}
 
 		// Save the values to the post
-		foreach($user_data as $key => $value) {
+		foreach( $user_data as $key => $value ) {
 
 			// http://codex.wordpress.org/Function_Reference/wp_update_user
-			if($key == 'twitter_name') {
+			if( $key == 'twitter_name' ) {
 
 				$user_id = update_user_meta( $user_id, $key, $value );
-				unset($user_data['twitter_name']);
+				unset( $user_data['twitter_name'] );
 
-			} elseif ($key == 'user_pass') {
+			} elseif ( $key == 'user_pass' ) {
 
 				$user_id = wp_set_password( $user_data['user_pass'], $user_id );
-				unset($user_data['user_pass']);
+				unset( $user_data['user_pass'] );
 
 			// Save the remaining values
 			} else {
@@ -123,18 +123,18 @@ function tutsplus_process_user_profile_data() {
 		}
 
 		// Display the messages error/success
-			if (!is_wp_error( $user_id )){
+			if ( ! is_wp_error( $user_id ) ){
 
-				wp_redirect('?profile-updated=true');
+				wp_redirect( '?profile-updated = true' );
 
 			} else {
 
-				wp_redirect("?profile-updated=false");
+				wp_redirect( '?profile-updated = false' );
 			}
 		exit;
 	}
 }
-add_action('tutsplus_process_user_profile','tutsplus_process_user_profile_data');
+add_action( 'tutsplus_process_user_profile', 'tutsplus_process_user_profile_data' );
 
 
 /**
@@ -145,24 +145,24 @@ add_action('tutsplus_process_user_profile','tutsplus_process_user_profile_data')
  */
 function tutsplus_display_messages( $content ) {
 
-	if( 'true' == $_GET['profile-updated']  ) :
+	if( 'true' == $_GET['profile-updated'] ) :
 
-	$message = tutsplus_get_message_markup('Your information was succesfully updated', 'success' );
+	$message = tutsplus_get_message_markup( 'Your information was succesfully updated', 'success' );
 
 	elseif( 'false' == $_GET['profile-updated'] ) :
 
-	$message = tutsplus_get_message_markup('There was an error processing your request', 'danger' );
+	$message = tutsplus_get_message_markup( 'There was an error processing your request', 'danger' );
 
 	elseif( 'true' == $_GET['password-error'] ) :
 
-	$message = tutsplus_get_message_markup('The passwords you provided did not match', 'danger' );
+	$message = tutsplus_get_message_markup( 'The passwords you provided did not match', 'danger' );
 
 	endif;
 
 	return $message . $content;
 
 }
-add_filter('the_content','tutsplus_display_messages', 1);
+add_filter( 'the_content', 'tutsplus_display_messages', 1 );
 
 /**
  * A little helper function to generate the Bootstrap alerts markup.
