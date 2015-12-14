@@ -194,7 +194,7 @@ function tutsplus_redirect_on_login( $redirect_to, $request, $user ) {
 
 		} else {
 
-			return home_url( 'profile' );
+			return home_url( 'my-account' );
 		}
 	} else {
 		return $redirect_to;
